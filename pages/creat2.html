@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>生成合約</title>
+    <link rel="stylesheet" href="../assets/css/creat2.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+
+    <div id="nav-placeholder"></div>
+    <link rel="stylesheet" href="../assets/css/nav.css">
+    <script src="../assets/js/nav.js"></script>
+
+    <main class="main-content">
+        <h1 class="page-title">
+            <span class="left-title">生成合約</span>
+            <span class="editable-title" contenteditable="true">生成合約1</span>
+        </h1>
+
+        <div class="container">
+
+            <!-- 聊天區域 -->
+            <div class="chat-section" id="chatSection">
+                <div class="chat-message system-message">
+                    <p>您好，我是合約生成助手。請告訴我您需要什麼合約，我將為您生成合約。</p>
+                </div>
+            </div>
+
+            <!-- 對方公司資訊查詢區域 -->
+            <div class="counterparty-info-section">
+                <div class="counterparty-header">
+                    <h3><i class="fas fa-building"></i> 對方公司基本資料</h3>
+                    <p class="section-desc">搜尋對方公司並自動帶入基本資訊</p>
+                </div>
+                <div class="counterparty-search">
+                    <div class="search-form">
+                        <div class="form-group">
+                            <label for="counterpartyIdCreat2">統一編號</label>
+                            <input 
+                                type="text" 
+                                id="counterpartyIdCreat2" 
+                                placeholder="請輸入公司統編（例：12345678）"
+                                class="search-input"
+                            >
+                        </div>
+                        <button id="queryBtnCreat2" class="query-btn">
+                            <i class="fas fa-search"></i> 查詢
+                        </button>
+                    </div>
+
+                    <!-- 加載動畫 -->
+                    <div id="counterpartyLoadingCreat2" class="loading-animation" style="display: none;">
+                        <div class="spinner"></div>
+                        <p id="counterpartyLoadingTextCreat2">正在連線商工登記資料庫...</p>
+                    </div>
+
+                    <!-- 查詢結果 -->
+                    <div id="counterpartyResultsCreat2" class="counterparty-results" style="display: none;">
+                        <div class="result-header">
+                            <h4><i class="fas fa-check-circle"></i> 查詢結果</h4>
+                            <button class="use-btn" id="useCounterpartyBtnCreat2">使用此資訊</button>
+                        </div>
+                        <div class="result-grid" id="counterpartyContentCreat2">
+                            <!-- 結果會在此顯示 -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 聊天輸入框區域 -->
+            <div class="input-section">
+                <div class="input-wrapper">
+                    <input type="text" id="messageInput" class="text-input" placeholder="描述您需要的合約...按 Enter 送出">
+                    <!-- 送出按鈕 -->
+                    <button class="upload-btn" id="sendBtn" onclick="sendMessage()">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+<script src="../assets/js/counterparty.js"></script>
+<script src="../assets/js/creat2-chat.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // 初始化對方公司查詢功能
+        setupCounterpartyListeners('Creat2');
+        
+        // --- 變數初始化 ---
+        const editBtn = document.querySelector('.edit-btn');
+        const editToolbar = document.querySelector('.edit-toolbar');
+        const dislikeBtn = document.querySelector('.dislike-btn');
+        const likeBtn = document.querySelector('.like-btn');
+        const feedbackModal = document.getElementById('feedbackModal');
+        const likeToast = document.getElementById('likeToast');
+        const contractActions = document.querySelector('.contract-actions');
+        const cancelBtn = document.querySelector('.cancel-btn');
+        const confirmBtn = document.querySelector('.confirm-btn');
+
+        // --- 事件監聽器設定 ---
+        editBtn.addEventListener('click', () => { editToolbar.style.display = 'flex'; contractActions.style.display = 'none'; });
+        cancelBtn.addEventListener('click', () => { editToolbar.style.display = 'none'; contractActions.style.display = 'flex'; });
+        confirmBtn.addEventListener('click', () => { editToolbar.style.display = 'none'; contractActions.style.display = 'flex'; });
+        dislikeBtn.addEventListener('click', () => feedbackModal.classList.add('show'));
+        likeBtn.addEventListener('click', () => {
+            likeToast.classList.add('show');
+            setTimeout(() => likeToast.classList.remove('show'), 2000);
+        });
+        document.querySelector('.cancel-feedback').addEventListener('click', () => feedbackModal.classList.remove('show'));
+        document.querySelector('.submit-feedback').addEventListener('click', () => {
+            feedbackModal.classList.remove('show');
+            alert("感謝您的意見！");
+        });
+
+        // 初始化聊天功能
+        initializeChat();
+    });
+</script>
+</body>
+</html>

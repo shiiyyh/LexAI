@@ -1,0 +1,376 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Microsoft JhengHei", sans-serif;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background-color: #101922;
+  color: #c4cfe0;
+}
+
+h1 {
+  color: white;
+  margin-bottom: 40px;
+  font-size: 2.5em;
+}
+
+.container {
+  flex: 1;
+  padding: 40px 0;
+}
+
+
+.main {
+  flex: 1; /* 撐開主要內容，footer 才會在底部 */
+  display: flex;
+  justify-content: center;
+}
+
+.main-content {
+  padding: 40px 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-left: 250px;
+  width: calc(100% - 250px);
+  transition: margin-left 0.3s ease, width 0.3s ease;
+}
+
+.main-content.collapsed {
+    margin-left: 60px;  /* 側邊欄縮起時的寬度 */
+    width: calc(100% - 60px);
+}
+
+/* 搜尋欄 */
+.search-bar {
+  display: flex;
+  align-items: center;
+  margin-bottom: 40px;
+  width: 100%;
+}
+
+.search-bar input {
+  flex: 1;
+  min-width: 0;
+  padding: 14px 20px;
+  font-size: 16px;
+  border: 1px solid #1a2733; /* 深色邊框 */
+  border-radius: 4px;
+  background-color: #1a2733; /* 深色背景 */
+  color: #afbaca;
+}
+
+.search-bar input::placeholder {
+  color: #afbaca;
+  opacity: 1;
+}
+
+.search-bar input:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px #2a3d4f; /* 聚焦時的藍色外框 */
+}
+
+.search-bar button {
+  margin-left: 10px;
+  padding: 14px 20px;
+  border: none;
+  background-color: #1a2733; /* 深色按鈕 */
+  color: #ffffff;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.search-bar button:hover {
+  background-color: #233342; /* 按鈕懸停效果 */
+}
+
+.search-bar button i {
+  font-size: 18px;
+  vertical-align: middle;
+}
+
+/* 卡片區 */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr); /* 固定三欄 */
+  gap: 50px;
+  width: 100%;
+  justify-items: center;
+}
+
+/* 卡片樣式 — 3:4 文件比例 */
+.card {
+  background-color: #1a2733; /* 深色背景 */
+  border-radius: 12px;
+  overflow: hidden;
+  width: 100%;
+  max-width: 320px;
+  aspect-ratio: 3 / 4;
+  text-align: center;
+  transition: 0.3s;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  position: relative; /* 為了搜尋時隱藏方便 */
+}
+
+.card img {
+  width: 100%;
+  height: 70%;
+  object-fit: cover;
+  border: none;
+}
+
+.card p {
+  flex: 1;
+  display: flex;
+  align-items: center;      /* 垂直置中 */
+  justify-content: center;  /* 水平置中 */
+  font-size: 16px;
+  color: #ffffff; /* 文字顏色 */
+  margin: 0;                /* 移除預設間距 */
+}
+
+.card:hover {
+  transform: translateY(-4px);
+  background-color: #1a2733; /* 懸停時的深色背景 */
+}
+
+/* 第一張卡片（新增範本） */
+.add-card {
+  border: 4px dashed #273a4b; /* 虛線邊框 */
+  background-color: transparent;
+  aspect-ratio: 3 / 4;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;   /* 垂直置中 */
+  align-items: center;       /* 水平置中 */
+  text-align: center;
+  transition: 0.3s;
+  position: relative;        /* 讓 transform 生效 */
+}
+
+.add-card > * {
+  margin-top: 8px;
+}
+
+
+.add-card i {
+  font-size: 45px;
+  color: #afbaca; /* 淺色圖示 */
+  margin-bottom: 100px;
+}
+
+.add-card p {
+  color: #afbaca; /* 淺色文字 */
+  font-size: 16px;
+  margin: 0;
+}
+
+.add-card:hover {
+  background-color: #1a2733;
+  transform: translateY(-3px);
+}
+
+.footer {
+  text-align: center;
+  padding: 15px;
+  background-color: #101922;
+  color: #afbaca;
+  font-size: 14px;
+}
+
+
+/* ---------- 響應式 ---------- */
+@media (max-width: 800px) {
+  .grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 25px;
+  }
+}
+
+@media (max-width: 500px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 600px) {
+  .add-card i {
+    margin-bottom: 14px; /* 手機版略緊湊 */
+  }
+}
+
+/* Modal 背景遮罩 */
+.modal {
+  display: none; /* 預設隱藏，JS 控制改為 flex */
+  position: fixed; 
+  z-index: 1000; 
+  left: 0;
+  top: 0;
+  width: 100%; 
+  height: 100%; 
+  overflow: auto; 
+  background-color: rgba(0,0,0,0.7); /* 黑色半透明背景 */
+  justify-content: center;
+  align-items: center;
+  backdrop-filter: blur(4px); /* 背景模糊效果 */
+}
+
+/* Modal 內容區塊 */
+.modal-content {
+  background-color: #1a2733;
+  margin: auto;
+  padding: 0;
+  border: 1px solid #2a3d4f;
+  width: 90%;
+  max-width: 500px;
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+  animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+  from { transform: translateY(-50px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+/* Modal Header */
+.modal-header {
+  padding: 20px;
+  border-bottom: 1px solid #2a3d4f;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.modal-header h3 {
+  color: #fff;
+  font-size: 1.2rem;
+  margin: 0;
+}
+
+.close-btn {
+  color: #aaa;
+  font-size: 28px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.close-btn:hover {
+  color: #fff;
+}
+
+/* Modal Body */
+.modal-body {
+  padding: 20px;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  color: #afbaca;
+  font-size: 0.9rem;
+}
+
+.form-group input[type="text"] {
+  width: 100%;
+  padding: 12px;
+  border-radius: 6px;
+  border: 1px solid #2a3d4f;
+  background-color: #101922;
+  color: #fff;
+  font-size: 1rem;
+}
+
+.form-group input[type="text"]:focus {
+  outline: none;
+  border-color: #4a90e2;
+}
+
+.select-file-btn {
+  padding: 10px 15px;
+  background-color: #2a3d4f;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.95rem;
+}
+
+.select-file-btn:hover {
+  background-color: #3a5066;
+}
+
+.file-name-display {
+  margin-top: 8px;
+  font-size: 0.9rem;
+  color: #666;
+  font-style: italic;
+}
+
+.file-name-display.active {
+  color: #4caf50; /* 綠色表示已選擇 */
+  font-style: normal;
+}
+
+/* Modal Footer */
+.modal-footer {
+  padding: 15px 20px;
+  border-top: 1px solid #2a3d4f;
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.btn-cancel {
+  background-color: transparent;
+  border: 1px solid #afbaca;
+  color: #afbaca;
+  padding: 10px 20px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.btn-cancel:hover {
+  background-color: rgba(255,255,255,0.05);
+  color: #fff;
+  border-color: #fff;
+}
+
+.btn-confirm {
+  background-color: #4a90e2; /* 藍色主按鈕 */
+  border: none;
+  color: #fff;
+  padding: 10px 20px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.btn-confirm:hover {
+  background-color: #357abd;
+}
+
+.btn-confirm:disabled {
+  background-color: #2a3d4f;
+  color: #666;
+  cursor: not-allowed;
+}

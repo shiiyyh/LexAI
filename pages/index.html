@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>首頁</title>
+<link rel="stylesheet" href="../assets/css/index.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+<style>
+
+</style>
+</head>
+<body>
+  <div id="nav-placeholder"></div>
+  <link rel="stylesheet" href="../assets/css/nav.css">
+  <script src="../assets/js/nav.js"></script>
+
+<main class="main-content">
+    <div id="welcomeMessage" class="welcome-box">
+        </div>
+    <div id="recentActivity" style="display: none;">
+        <h2><i class="fas fa-history"></i> 最近活動</h2>
+        <ul class="activity-list" id="activityList">
+            </ul>
+    </div>
+</main>
+
+
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        // 設置寫死的會員數據
+        const fixedUser = {
+            name: "王小明",
+            email: "Wang0125@gmail.com",
+            role: "普通會員"
+        };
+        localStorage.setItem("loggedInUser", JSON.stringify(fixedUser));
+        
+        // 等待導航欄加載完成
+        setTimeout(() => {
+            renderHome(); // 初始化首頁內容
+            updateNavName(); // 更新導航欄名稱
+        }, 100);
+
+        function updateNavName() {
+            const userName = document.querySelector('.sidebar-footer-name');
+            if (userName) {
+                userName.textContent = '王小明';
+            }
+        }
+
+        function renderHome() {
+            const welcomeBox = document.getElementById('welcomeMessage');
+            const recentSection = document.getElementById('recentActivity');
+
+            const recentActivities = [
+                { type: "review", title: "合約審閱完成：採購合約 V2.1", date: "2025-11-06 14:30" },
+                { type: "create", title: "合約生成完成：保密協議草稿", date: "2025-11-06 10:15" },
+                { type: "review", title: "合約審閱完成：租賃合同 Q3", date: "2025-11-05 17:55" },
+                { type: "create", title: "合約生成完成：服務條款範本", date: "2025-11-05 09:40" },
+            ];
+
+            function getActivityIcon(type) {
+                if (type === "review") return '<i class="fas fa-file-contract activity-icon" style="color: #28a745;"></i>';
+                if (type === "create") return '<i class="fas fa-file-signature activity-icon" style="color: #007bff;"></i>';
+                return '<i class="fas fa-check-circle activity-icon"></i>';
+            }
+
+            function renderActivities() {
+                const activityList = document.getElementById('activityList');
+                let html = '';
+                recentActivities.forEach(a => {
+                    html += `<li class="activity-card">
+                                ${getActivityIcon(a.type)}
+                                <div class="activity-details">
+                                    <p class="activity-title">${a.title}</p>
+                                    <p class="activity-date"><i class="fas fa-calendar-alt"></i> ${a.date}</p>
+                                </div>
+                            </li>`;
+                });
+                activityList.innerHTML = html;
+            }
+
+            welcomeBox.innerHTML = `<h1>歡迎回來，王小明！</h1>
+                                    <p>您已成功登入 LexAI 系統，請開始您的合約審閱或生成作業。</p>`;
+            recentSection.style.display = 'block';
+            renderActivities();
+        }
+
+        function highlightCurrent() {
+            const navLinks = document.querySelectorAll('.nav-link');
+            const currentPath = window.location.pathname.split("/").pop();
+            navLinks.forEach(link => {
+                const linkPath = link.getAttribute('href').split("/").pop();
+                link.classList.toggle('active', linkPath === currentPath);
+            });
+        }
+    });
+
+
+
+</script>
+</body>
+</html>

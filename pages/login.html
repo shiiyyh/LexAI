@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>登入</title>
+  <link rel="stylesheet" href="../assets/css/login.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+
+  <div id="nav-placeholder"></div>
+  <link rel="stylesheet" href="../assets/css/nav.css">
+  <script src="../assets/js/nav.js"></script>
+
+  <div class="login-container">
+    <h1>登入帳號</h1>
+
+    <form class="login-form" onsubmit="realLogin(event)">
+      <label for="username">電子郵件</label>
+      <input type="text" id="username" placeholder="請輸入電子郵件" required>
+
+      <label for="password">密碼</label>
+      <input type="password" id="password" placeholder="請輸入密碼" required>
+
+      <div class="btn-group">
+        <button type="button" class="btn register-btn" onclick="goToRegister()">註冊</button>
+        <button type="submit" class="btn login-btn">登入</button>
+      </div>
+    </form>
+  </div>
+
+  <script>
+    // 💡 步驟 1: n8n Webhook 登入 URL
+    const N8N_LOGIN_URL = 'http://localhost:5678/webhook/login'; 
+    
+    // 導向註冊頁
+    function goToRegister() {
+      window.location.href = "register.html";
+    }
+
+    // 💡 步驟 2: 真實的登入邏輯
+    async function realLogin(event) {
+      event.preventDefault(); 
+
+      // 【優化1】登入前先清空舊資料，避免髒數據殘留
+      localStorage.removeItem("user_id");
+      localStorage.removeItem("loggedInUser");
+
+      const emailInput = document.getElementById('username').value.trim();
+      const passwordInput = document.getElementById('password').value;
+
+      if (!emailInput || !passwordInput) {
+        alert("請輸入完整的帳號和密碼。");
+        return;
+      }
+      
+      const loginData = {
+        email: emailInput, 
+        password: passwordInput
+      };
+
+      try {
+        const response = await fetch(N8N_LOGIN_URL, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(loginData)
+        });
+
+        // 【優化2】針對 500 錯誤提供更詳細的資訊
+        if (!response.ok) {
+            let errorMsg = `狀態碼: ${response.status}`;
+            try {
+                // 嘗試讀取伺服器回傳的錯誤文字
+                const errorText = await response.text();
+                if (errorText) errorMsg += `\n錯誤詳情: ${errorText.substring(0, 100)}`;
+            } catch(e) {}
+            
+            alert(`登入失敗 (伺服器錯誤)。\n${errorMsg}\n請檢查 n8n 流程是否正常運行。`);
+            return;
+        }
+
+        const result = await response.json();
+        
+        // 💡 步驟 3: 處理結果
+        if (result.success) {
+          // 登入成功
+          alert(result.message); 
+          
+          localStorage.setItem("loggedInUser", emailInput); 
+
+          // 【優化3】檢查 User ID 是否有效
+          if (result.user_id) {
+              // 檢查是否又不小心傳回了代碼字串
+              if (result.user_id.includes("{{") || result.user_id.includes("}}")) {
+                  console.error("嚴重錯誤：n8n 回傳了未解析的變數代碼", result.user_id);
+                  alert("系統設定錯誤：無法獲取正確的用戶 ID，請聯繫管理員 (n8n Expression Error)。");
+                  return;
+              }
+
+              localStorage.setItem("user_id", result.user_id);
+              console.log("登入成功，已儲存 User ID:", result.user_id); 
+          } else {
+              console.error("警告：n8n 沒有回傳 user_id");
+              alert("登入異常：伺服器未回傳身份 ID。");
+              return;
+          }
+
+          // 執行跳轉
+          window.location.href = result.redirect || "creat2.html"; 
+        } else {
+          // 登入失敗 (帳號或密碼錯誤)
+          alert(result.message || "帳號或密碼錯誤");
+          // 如果有 redirect 就跳轉，沒有就留在原地
+          if (result.redirect) {
+              window.location.href = result.redirect; 
+          }
+        }
+
+      } catch (error) {
+        console.error('登入時發生連線錯誤:', error);
+        alert('無法連線到伺服器，請檢查網路或稍後再試。');
+      }
+    }
+  </script>
+</body>
+</html>

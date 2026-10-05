@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>範本</title>
+  <link rel="stylesheet" href="../assets/css/ex.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">   
+</head>
+<body>
+
+
+  <div id="nav-placeholder"></div>
+  <link rel="stylesheet" href="../assets/css/nav.css">
+  <script src="../assets/js/nav.js"></script>
+
+  <main class="main-content">
+    <div class="main">
+      <div>
+        <h1>選擇/上傳範本</h1>
+
+        <!-- 搜尋欄 -->
+        <div class="search-bar">
+          <input type="text" id="searchInput" placeholder="搜尋範本..." onkeyup="searchTemplates()">
+          <button onclick="searchTemplates()"><i class="bi bi-search"></i></button>
+        </div>
+
+         <!-- 隱藏的檔案上傳 Input (供 JS 呼叫) -->
+        <input type="file" id="templateFileInput" accept=".pdf,.docx,.doc,.txt" style="display: none;">
+
+        <!-- 範本清單 -->
+        <div class="grid" id="templateGrid">
+          <!-- 新增範本卡片 (點擊觸發彈窗) -->
+          <div class="card add-card" onclick="openUploadModal()">
+            <div class="add-content">
+              <i class="bi bi-file-earmark-plus"></i>
+              <p>新增範本</p>
+            </div>
+          </div>
+
+          <!-- 靜態範本 (之後可由 n8n 動態載入) -->
+           <a href="ex_generate.html?template=採購合約書" class="card template-card" style="text-decoration: none; color: inherit;">
+            <img src="../assets/images/養殖.jpg">
+            <p>採購合約範本</p>
+          </a> 
+          <a href="ex_generate.html?template=商品供貨合約書" class="card template-card" style="text-decoration: none; color: inherit;">
+            <img src="../assets/images/供貨.png">
+            <p>商品供貨合約書範本</p>
+          </a>
+          <a href="ex_generate.html?template=倉儲合約書" class="card template-card" style="text-decoration: none; color: inherit;">
+            <img src="../assets/images/倉處.jpg">
+            <p>倉儲合約書範本</p>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- 上傳/命名 彈跳視窗 (Modal) -->
+    <div id="uploadModal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>上傳新範本</h3>
+          <span class="close-btn" onclick="closeUploadModal()">&times;</span>
+        </div>
+        
+        <div class="modal-body">
+          <div class="form-group">
+            <label>範本名稱</label>
+            <input type="text" id="newTemplateName" placeholder="例如：房屋租賃契約範本">
+          </div>
+          
+          <div class="form-group">
+            <label>選擇檔案</label>
+            <button class="select-file-btn" onclick="triggerFileSelect()">
+              <i class="bi bi-folder2-open"></i> 選擇 PDF/Word 檔
+            </button>
+            <div id="fileNameDisplay" class="file-name-display">尚未選擇檔案</div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button class="btn-cancel" onclick="closeUploadModal()">取消</button>
+          <button class="btn-confirm" onclick="submitTemplate()" id="confirmUploadBtn" disabled>確認上傳</button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script src="../assets/js/ex.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,138 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Microsoft JhengHei", sans-serif;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background-color: #101922;
+  color: #c4cfe0;
+}
+
+h1 {
+  color: white;
+  margin-bottom: 40px;
+  font-size: 2.5em;
+  font-weight: bold;
+}
+
+.container {
+  flex: 1;
+  padding: 40px 20px;  /* ★ 修改：左右增加 20px 間距，避免手機版貼邊 */
+  
+  /* ★ 新增以下兩行來控制寬度 ★ */
+  max-width: 900px;    /* 限制最大寬度為 900px (你可以改成 800px 或 1000px) */
+  margin: 0 auto;
+}
+
+/* 清單樣式 */
+.record-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* 清單項目 */
+.record-item {
+  background-color: #1a2733;
+  border-radius: 8px;
+  padding: 16px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  text-decoration: none;
+  color: inherit;
+  cursor: pointer;
+  transition: background-color 0.2s ease-in-out, transform 0.2s ease-in-out;
+  border: 1px solid transparent;
+}
+
+.record-item:hover {
+  background-color: #2a3c4d;
+  transform: translateX(4px);
+}
+
+.record-title {
+  font-size: 16px;
+  font-weight: 500;
+  color: #ffffff;
+  flex: 1;
+}
+
+.record-date {
+  font-size: 13px;
+  color: #afbaca;
+  white-space: nowrap;
+  margin-left: 20px;
+}
+
+/* ---------- 下拉選單（完全自訂版） ---------- */
+.sort-btn {
+  background-color: #1c2733; /* 按鈕背景 */
+  color: #ffffff; /* 按鈕文字 */
+  border: 1px solid #3c4c5d; /* 按鈕邊框 */
+  border-radius: 8px;
+  padding: 6px 14px;
+}
+
+.sort-btn:hover,
+.sort-btn:focus {
+  background-color: #3c4c5d; /* 懸停背景 */
+  border-color: #3c4c5d; /* 懸停邊框 */
+  color: #ffffff; /* 懸停文字 */
+}
+
+.sort-menu {
+  background-color: #1c2733; /* 選單背景 */
+  border: 1px solid #3c4c5d; /* 選單邊框 */
+  border-radius: 10px;
+  padding: 0;
+  overflow: hidden;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+}
+
+/* 選單項目 */
+.sort-menu .dropdown-item {
+  color: #afbaca;  /* 預設文字顏色 */
+  padding: 10px 16px;
+  transition: 0.15s;
+}
+
+.sort-menu .dropdown-item:hover,
+.sort-menu .dropdown-item:focus {
+  background-color: #3c4c5d; /* 懸停背景顏色 */
+  color: #ffffff; /* 懸停文字顏色 */
+}
+
+/* 響應式調整 */
+@media (max-width: 1000px) {
+  .record-info p {
+    display: none;
+  }
+  .record-info h5 {
+    font-size: 15px;
+  }
+}
+
+@media (max-width: 800px) {
+  .record-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 25px;
+  }
+  .record-info h5 {
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 500px) {
+  .record-grid {
+    grid-template-columns: 1fr;
+  }
+  .record-info h5 {
+    font-size: 13px;
+  }
+}

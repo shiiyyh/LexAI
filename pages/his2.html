@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>合約內容</title>
+    <link rel="stylesheet" href="../assets/css/creat2.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div id="nav-placeholder"></div>
+    <link rel="stylesheet" href="../assets/css/nav.css">
+    <script src="../assets/js/nav.js"></script>
+
+    <main class="main-content">
+        <h1 class="page-title">
+            <span class="left-title">合約內容</span>
+            <span class="editable-title" contenteditable="true">「百川水產養殖有限公司」的採購合約紀錄</span>
+        </h1>
+
+        <div class="container">
+            <div class="chat-section" id="chatSection"></div>
+
+            <div class="feedback-section" style="margin-top: 40px; padding: 30px; background: #2c3e50; border-radius: 10px; border-top: 3px solid #3498db;">
+                <h3 style="margin-bottom: 20px; color: #ecf0f1;"><i class="fas fa-comments"></i> 合約評分與回饋</h3>
+                <div style="display: flex; gap: 10px;">
+                    <button id="likeBtn" style="padding: 12px 24px; background: #27ae60; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 14px; font-weight: 600;">
+                        <i class="fas fa-thumbs-up"></i> 滿意
+                    </button>
+                    <button id="dislikeBtn" style="padding: 12px 24px; background: #e74c3c; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 14px; font-weight: 600;">
+                        <i class="fas fa-thumbs-down"></i> 提供回饋
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <div class="feedback-modal" id="feedbackModal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:999;justify-content:center;align-items:center;">
+        <div style="background:#2c3e50;padding:30px;border-radius:10px;width:90%;max-width:500px;">
+            <h2 style="color:#ecf0f1;margin-bottom:20px;">請提供您的回饋</h2>
+            <textarea placeholder="請輸入您的回饋內容..." style="width:100%;height:120px;padding:10px;border:1px solid #34495e;border-radius:5px;background:#1a252f;color:#ecf0f1;font-family:Arial;resize:vertical;"></textarea>
+            <div style="margin-top:20px;display:flex;justify-content:flex-end;gap:10px;">
+                <button class="cancel-feedback" style="padding:10px 20px;background:#7f8c8d;color:white;border:none;border-radius:5px;cursor:pointer;">取消</button>
+                <button class="submit-feedback" style="padding:10px 20px;background:#3498db;color:white;border:none;border-radius:5px;cursor:pointer;">提交</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="likeToast" style="position:fixed;bottom:20px;right:20px;background:#27ae60;color:white;padding:15px 25px;border-radius:5px;display:none;z-index:1000;">
+        感謝您的回饋！
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetch('nav.html')
+                .then(res => res.text())
+                .then(data => {
+                    document.getElementById('nav-placeholder').innerHTML = data;
+                    document.querySelectorAll('.toggle-btn').forEach(btn => {
+                        btn.addEventListener('click', function() {
+                            const sidebar = document.querySelector('.sidebar');
+                            const mainContent = document.querySelector('.main-content');
+                            if(sidebar) sidebar.classList.toggle('collapsed');
+                            if(mainContent) mainContent.classList.toggle('collapsed');
+                        });
+                    });
+                    
+                    // 初始化登入狀態顯示
+                    initAuth();
+                })
+                .catch(console.error);
+
+            setTimeout(() => renderChat(), 300);
+
+            const modal = document.getElementById('feedbackModal');
+            document.getElementById('likeBtn').addEventListener('click', () => {
+                const toast = document.getElementById('likeToast');
+                toast.style.display = 'block';
+                setTimeout(() => toast.style.display = 'none', 2000);
+            });
+            document.getElementById('dislikeBtn').addEventListener('click', () => {
+                modal.style.display = 'flex';
+            });
+            document.querySelector('.cancel-feedback').addEventListener('click', () => {
+                modal.style.display = 'none';
+            });
+            document.querySelector('.submit-feedback').addEventListener('click', () => {
+                modal.style.display = 'none';
+                const toast = document.getElementById('likeToast');
+                toast.style.display = 'block';
+                setTimeout(() => toast.style.display = 'none', 2000);
+            });
+        });
+
+        function renderChat() {
+            const content = document.getElementById('chatSection');
+            const contractText = '養殖生產設備買賣合約\n\n第一條 標的物\n本合約所稱標的物係指由賣方提供之養殖生產設備。\n\n第二條 價金\n本合約標的物總價金為新台幣____元。\n\n第三條 交付\n賣方應於合約簽訂後______日內交付於買方。\n\n第四條 運送責任\n交付前由賣方承擔，交付後由買方承擔。\n\n第五條 保固期限\n保固期為____年，期內如有瑕疵賣方應負責修理。\n\n第六條 付款方式\n買方應於交付後_______日內支付價金。\n\n第七條 違約責任\n任何一方違反本合約應賠償他方損失。\n\n第八條 爭議解決\n爭議首先以協商方式解決，協商不成時提請仲裁。\n\n第九條 其他\n本合約自簽訂日起生效，雙方簽署各執一份。';
+
+            content.innerHTML = '<div class="chat-message system-message"><p>您好，我是合約生成助手。請告訴我您需要什麼合約，我將為您生成合約。</p></div>' +
+            '<div class="chat-message user-message"><p>我需要一份養殖生產設備買賣合約</p></div>' +
+            '<div class="chat-message system-message"><p>好的！我已為您生成 <strong>養殖生產設備買賣合約</strong>。</p>' +
+            '<p>這份合約涵蓋以下主要內容：</p>' +
+            '<ul style="margin: 15px 0; padding-left: 30px; color: #bdc3c7;">' +
+            '<li>標的物說明與規格</li>' +
+            '<li>價款及付款方式</li>' +
+            '<li>交付地點及運送責任</li>' +
+            '<li>保固期限及保固範圍</li>' +
+            '<li>違約責任條款</li>' +
+            '<li>爭議解決機制</li>' +
+            '</ul>' +
+            '<p>合約範本如下所示，您可根據實際情況填寫相關資訊。</p></div>' +
+            '<div class="chat-message system-message" style="margin-top:20px;"><div style="background:#1a252f;padding:20px;border-radius:8px;"><div style="color:#ecf0f1;font-size:13px;line-height:1.8;white-space:pre-wrap;word-break:break-word;">' + contractText + '</div></div>' +
+            '<div style="margin-top:20px;display:flex;gap:10px;">' +
+            '<button onclick="downloadContract()" style="padding:12px 24px;background:#27ae60;color:white;border:none;border-radius:5px;cursor:pointer;font-weight:600;"><i class="fas fa-download"></i> 下載</button>' +
+            '<button onclick="printContract()" style="padding:12px 24px;background:#3498db;color:white;border:none;border-radius:5px;cursor:pointer;font-weight:600;"><i class="fas fa-print"></i> 列印</button>' +
+            '</div></div>';
+        }
+
+        function downloadContract() {
+            const text = '養殖生產設備買賣合約\n\n第一條 標的物\n本合約所稱標的物係指由賣方提供之養殖生產設備。\n\n第二條 價金\n本合約標的物總價金為新台幣____元。';
+            const blob = new Blob([text], {type: 'text/plain;charset=utf-8'});
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = '養殖生產設備買賣合約.txt';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        function printContract() {
+            const text = '養殖生產設備買賣合約\n\n第一條 標的物\n本合約所稱標的物係指由賣方提供之養殖生產設備。\n\n第二條 價金\n本合約標的物總價金為新台幣____元。';
+            const win = window.open();
+            win.document.write('<pre style="font-family:Arial;margin:20px;white-space:pre-wrap;">' + text + '</pre>');
+            win.document.close();
+            setTimeout(() => win.print(), 500);
+        }
+
+        // 初始化認證UI
+        function initAuth() {
+            const sidebarAuth = document.getElementById("sidebarAuth");
+            if (!sidebarAuth) return;
+
+            function renderAuthContent(user) {
+                if (user) {
+                    let userName = "使用者";
+                    try {
+                        const userData = JSON.parse(user);
+                        userName = userData.name || "使用者";
+                    } catch (e) {
+                        userName = user;
+                    }
+                    return `
+                        <div class="user-info">
+                            <i class="fas fa-user-circle"></i>
+                            <div class="sidebar-footer-name">${userName}</div>
+                            <button id="logoutBtn" class="btn-logout">登出</button>
+                        </div>
+                    `;
+                }
+                return `
+                    <div class="auth-links">
+                        <button class="auth-toggle">
+                            <i class="fas fa-user"></i>
+                            <span>登入/註冊</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <div class="auth-dropdown" id="authDropdown">
+                            <a href="../pages/login.html" class="auth-option">登入</a>
+                            <a href="../pages/register.html" class="auth-option">註冊</a>
+                        </div>
+                    </div>
+                `;
+            }
+
+            function setupAuthDropdown() {
+                const authToggle = sidebarAuth.querySelector('.auth-toggle');
+                const authDropdown = document.getElementById('authDropdown');
+                
+                if (authToggle && authDropdown) {
+                    const newAuthToggle = authToggle.cloneNode(true);
+                    authToggle.parentNode.replaceChild(newAuthToggle, authToggle);
+                    
+                    newAuthToggle.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        authDropdown.classList.toggle('show');
+                    });
+                }
+            }
+
+            function updateAuthUI() {
+                const user = localStorage.getItem("loggedInUser");
+                sidebarAuth.innerHTML = renderAuthContent(user);
+
+                if (user) {
+                    const logoutBtn = document.getElementById("logoutBtn");
+                    if (logoutBtn) {
+                        logoutBtn.addEventListener("click", async () => {
+                            localStorage.removeItem("loggedInUser");
+                            alert("您已成功登出！");
+                            window.location.href = "../pages/index.html";
+                        });
+                    }
+                } else {
+                    setupAuthDropdown();
+                }
+
+                document.addEventListener('click', () => {
+                    const dropdown = document.getElementById('authDropdown');
+                    if (dropdown) {
+                        dropdown.classList.remove('show');
+                    }
+                });
+            }
+
+            updateAuthUI();
+
+            window.addEventListener('storage', (e) => {
+                if (e.key === 'loggedInUser') {
+                    updateAuthUI();
+                }
+            });
+        }
+    </script>
+</body>
+</html>

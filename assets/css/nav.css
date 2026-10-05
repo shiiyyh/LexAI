@@ -1,0 +1,408 @@
+/* 側邊導航欄樣式 */
+.sidebar {
+    width: 250px;
+    height: 100vh;
+    background-color: #1a2733;
+    padding: 20px 0;
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    left: 0;
+    top: 0;
+    transition: width 0.3s ease;
+    z-index: 1000;
+}
+
+.sidebar.collapsed {
+    width: 60px;
+}
+
+.toggle-btn {
+    position: fixed;
+    left: 235px;  /* sidebar 寬度 - 15px */
+    top: 20px;
+    background: rgba(26, 39, 51, 0.9);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+    color: white;
+    padding: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease, left 0.3s ease;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1001;
+}
+
+.sidebar.collapsed .toggle-btn {
+    left: 45px;  /* 收合後的 sidebar 寬度 - 15px */
+}
+
+.sidebar {
+    pointer-events: auto; /* 確保側邊欄可以接收點擊事件 */
+}
+
+/* 使用者資訊區塊 */
+.auth-links {
+    padding: 15px 20px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    margin-top: auto;
+}
+
+.auth-toggle {
+    width: 100%;
+    height: 36px; /* 統一按鈕高度 */
+    background: none;
+    border: none;
+    color: #ffffff;
+    padding: 0 12px;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    border-radius: 5px;
+    font-size: 14px;
+}
+
+.auth-toggle:hover {
+    background-color: #2c3e50;
+}
+
+.auth-toggle i {
+    margin-right: 10px;
+    font-size: 14px; /* 統一圖示大小 */
+}
+
+.auth-toggle span {
+    font-size: 14px;
+    line-height: 36px; /* 配合按鈕高度 */
+}
+
+.auth-toggle .fa-chevron-down {
+    margin-left: auto;
+    font-size: 0.8em;
+    transition: transform 0.3s;
+}
+
+.auth-dropdown {
+    display: none;
+    background-color: #2c3e50;
+    border-radius: 5px;
+    margin-top: 5px;
+    overflow: hidden;
+}
+
+.auth-dropdown.show {
+    display: block;
+}
+
+.auth-option {
+    display: flex;
+    align-items: center;
+    color: #ffffff;
+    text-decoration: none;
+    padding: 0 12px;
+    height: 36px;
+    transition: background-color 0.3s;
+    font-size: 14px;
+}
+
+.auth-option:hover {
+    background-color: #3498db;
+}
+
+/* 登入後的使用者資訊 */
+.user-info {
+    padding: 15px 20px;
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    margin-top: auto;
+}
+
+.user-info i {
+    font-size: 14px;
+    color: #3498db;
+}
+
+.user-info span {
+    flex: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 14px;
+}
+
+.btn-logout {
+    height: 36px;
+    background-color: #e74c3c;
+    color: white;
+    border: none;
+    padding: 0 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-logout:hover {
+    background-color: #c0392b;
+}
+
+/* 收合狀態樣式 */
+.sidebar.collapsed .auth-links {
+    padding: 15px 10px;
+}
+
+.sidebar.collapsed .auth-toggle span,
+.sidebar.collapsed .auth-toggle .fa-chevron-down {
+    display: none;
+}
+
+.sidebar.collapsed .user-info {
+    padding: 15px 10px;
+    justify-content: center;
+}
+
+.sidebar.collapsed .user-info span,
+.sidebar.collapsed .btn-logout {
+    display: none;
+}
+
+.sidebar.collapsed .user-info i {
+    margin: 0;
+    font-size: 1.5em;
+}
+
+.toggle-btn:hover {
+    background: rgba(26, 39, 51, 1);
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+.sidebar.collapsed .toggle-btn {
+    transform: rotate(180deg);
+    right: -15px; /* 確保收合時的位置也正確 */
+}
+
+.nav-title {
+    padding: 0 20px;
+    margin-bottom: 30px;
+    position: relative;
+}
+
+.logo-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 0;
+}
+
+.logo {
+    width: 60px;
+    height: 60px;
+    object-fit: contain;
+    transition: all 0.3s ease;
+}
+
+.logo-text {
+    color: white;
+    font-size: 1.5em;
+    font-weight: bold;
+    white-space: nowrap;
+}
+
+.sidebar.collapsed .logo-text {
+    display: none;
+}
+
+.sidebar.collapsed .logo {
+    width: 45px;
+    height: 45px;
+    margin: 0 auto;
+    display: block;
+}
+
+.sidebar.collapsed .logo-container {
+    justify-content: center;
+}
+
+.nav-links {
+    flex: 1;
+}
+
+.nav-link {
+    display: flex;
+    align-items: center;
+    padding: 12px 20px;
+    color: #ffffff;
+    text-decoration: none;
+    transition: background-color 0.3s;
+}
+
+.nav-link:hover {
+    background-color: #2c3e50;
+}
+
+.nav-link.active {
+    background-color: #2c3e50;
+    border-left: 4px solid #3498db;
+}
+
+.nav-link i {
+    margin-right: 10px;
+    width: 20px;
+    text-align: center;
+}
+
+.sidebar.collapsed .nav-link span {
+    display: none;
+}
+
+.sidebar.collapsed .nav-link {
+    padding: 12px;
+    justify-content: center;
+}
+
+.sidebar.collapsed .nav-link i {
+    margin: 0;
+}
+
+/* 登入/註冊區域 */
+.auth-links {
+    padding: 20px;
+    border-top: 1px solid #2c3e50;
+}
+
+.sidebar.collapsed .auth-toggle span,
+.sidebar.collapsed .auth-toggle i:last-child {
+    display: none;
+}
+
+.sidebar.collapsed .auth-dropdown {
+    position: absolute;
+    left: 100%;
+    bottom: 0;
+    width: 150px;
+    margin-top: 0;
+}
+
+.auth-toggle {
+    width: 100%;
+    padding: 10px;
+    background: none;
+    border: none;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+}
+
+.auth-toggle i:last-child {
+    transition: transform 0.3s;
+}
+
+.auth-dropdown {
+    display: none;
+    margin-top: 10px;
+    background-color: #2c3e50;
+    border-radius: 5px;
+    overflow: hidden;
+}
+
+.auth-dropdown.show {
+    display: block;
+}
+
+.auth-option {
+    display: block;
+    padding: 10px;
+    color: white;
+    text-decoration: none;
+    transition: background-color 0.3s;
+}
+
+.auth-option:hover {
+    background-color: #34495e;
+}
+
+    /* 登入後使用者資訊 (已登入) */
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 20px;
+}
+.sidebar.collapsed .user-info {
+    justify-content: center;
+    padding: 12px 0;
+}
+
+.user-info i.fas.fa-user-circle {
+    font-size: 40px;
+    color: #00bfff;
+}
+.sidebar.collapsed .user-info i.fas.fa-user-circle {
+    font-size: 28px;
+}
+
+.user-info span {
+    font-weight: bold;
+    color: #ffffff;
+    flex-shrink: 0;
+}
+
+.user-info .btn-logout {
+    margin-left: auto;
+    padding: 5px 10px;
+    background-color: #3498db;
+    border: none;
+    border-radius: 5px;
+    color: white;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.user-info .btn-logout:hover {
+    background-color: #2980b9;
+}
+
+/* footer */
+  .footer {
+    position: fixed;
+    bottom: 0;
+    left: 0; 
+    width: 100%; 
+    background-color: #101922;
+    color: white;
+    text-align: center;
+    padding: 6px 0;
+    font-size: 0.7em;
+    z-index: 100; 
+  }
+
+.footer p {
+    width: 100%;
+    text-align: center; /* 永遠水平置中 */
+    color: white;
+    margin: 0; 
+}
+
+.main-content {
+    margin-left: 250px;   /* 側邊欄初始寬度 */
+    flex: 1;
+    transition: margin-left 0.3s ease;
+}
+
+.main-content.collapsed {
+    margin-left: 60px;    /* 側邊欄收縮後寬度 */
+}
+
+

@@ -1,0 +1,116 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background-color: #101922;
+    font-family: "Microsoft JhengHei", Arial, sans-serif;
+    min-height: 100vh;
+    display: flex;
+}
+
+/* 主要內容區域 */
+.main-content {
+    margin-left: 250px;
+    flex: 1;
+    padding: 50px;
+    transition: margin-left 0.3s ease;
+}
+
+.main-content.collapsed {
+    margin-left: 60px;
+}
+
+.container {
+    width: 80%;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+h1 {
+    color: white;
+    margin-bottom: 40px;
+    font-size: 2.5em;
+}
+
+.button-group {
+    margin-bottom: 30px;
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+}
+
+.action-button {
+    padding: 15px 30px;  /* 增加按鈕內部間距 */
+    font-size: 1.1em;
+    background-color: #102b46;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-block;  /* 確保按鈕有正確的間距 */
+    margin-top: 20px;  /* 增加與上方文字的間距 */
+}
+
+.template-btn {
+    background-color: #2980b9;
+}
+
+.template-btn:hover {
+    background-color: #3498db;
+}
+
+.generate-btn {
+    background-color: #27ae60;
+}
+
+.generate-btn:hover {
+    background-color: #2ecc71;
+}
+
+.action-button:hover {
+    transform: translateY(-2px);
+}
+
+.options-container {
+    display: flex;
+    justify-content: space-between;
+    gap: 60px;  /* 增加卡片之間的間距 */
+    margin: 0 auto;
+    max-width: 1000px;  /* 限制最大寬度 */
+    padding: 0 20px;
+}
+
+.option-card {
+    flex: 1;
+    background: linear-gradient(145deg, #1a2733 0%, #1e2a38 100%);
+    padding: 40px;  /* 增加內部間距 */
+    border-radius: 15px;
+    text-align: center;
+    color: white;
+    margin-bottom: 40px;  /* 增加底部間距 */
+}
+
+.option-card h2 {
+    margin-bottom: 20px;  /* 標題下方間距 */
+    font-size: 24px;
+}
+
+.option-card p {
+    margin-bottom: 30px;  /* 段落下方間距 */
+    line-height: 1.6;
+    color: #a8b2bd;
+}
+
+.welcome-text {
+    font-size: 18px;
+    text-align: center;
+    color: white;
+    margin-bottom: 40px;
+}
+
+

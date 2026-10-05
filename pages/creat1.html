@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>生成合約</title>
+    <link rel="stylesheet" href="../assets/css/creat1.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+
+    <div id="nav-placeholder"></div>
+    <link rel="stylesheet" href="../assets/css/nav.css">
+    <script src="../assets/js/nav.js"></script>
+
+    <main class="main-content">
+        <div class="container">
+            <div class="welcome-section">
+                <h1>生成合約</h1>
+                <p class="welcome-text">歡迎使用 LexAI 合約生成系統</p>
+            </div>
+            
+            <div class="options-container">
+                <div class="option-card">
+                    <div class="option-icon">
+                        <i class="fas fa-file-alt"></i>
+                    </div>
+                    <h2>選擇現有範本</h2>
+                    <p>從我們的範本庫中選擇適合您需求的合約範本</p>
+                    <a href="ex.html" class="action-button template-btn">
+                        <i class="fas fa-wand-magic-sparkles"></i>
+                        瀏覽範本
+                    </a>
+                </div>
+
+                <div class="option-card">
+                    <div class="option-icon">
+                        <i class="fas fa-magic"></i>
+                    </div>
+                    <h2>產生新合約</h2>
+                    <p>使用 AI 智能分析，為您量身打造專屬合約</p>
+                    <a href="creat2.html" class="action-button generate-btn">
+                        <i class="fas fa-wand-magic-sparkles"></i>
+                        開始生成
+                    </a>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        async function submitContract() {
+        const text = document.getElementById("contractInput").value;
+        
+        const res = await fetch("http://localhost:5678/webhook/contract_upload", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+            user_id: currentUserId,
+            contract_text: text
+            })
+        });
+
+        const data = await res.json();
+            displayReviewResult(data);
+        }
+
+    </script>
+
+</body>
+</html>

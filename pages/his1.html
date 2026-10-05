@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>歷史紀錄</title>
+    <link rel="stylesheet" href="../assets/css/creat2.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .records-list {
+            margin-top: 20px;
+        }
+        .record-item {
+            background: #2c3e50;
+            border: 1px solid #34495e;
+            border-left: 4px solid #3498db;
+            border-radius: 5px;
+            padding: 20px;
+            margin-bottom: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            color: inherit;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .record-item:hover {
+            background: #34495e;
+            border-left-color: #27ae60;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+        .record-info {
+            flex: 1;
+        }
+        .record-title {
+            color: #ecf0f1;
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        .record-date {
+            color: #95a5a6;
+            font-size: 13px;
+        }
+        .record-status {
+            background: #27ae60;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-left: 20px;
+            white-space: nowrap;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="nav-placeholder"></div>
+    <link rel="stylesheet" href="../assets/css/nav.css">
+    <script src="../assets/js/nav.js"></script>
+
+    <main class="main-content">
+        <h1 class="page-title">
+            <span class="left-title">歷史紀錄</span>
+            <span class="editable-title" contenteditable="true">合約生成紀錄</span>
+        </h1>
+
+        <div class="container">
+            <div class="records-list" id="recordsContainer">
+                <!-- 合約列表將在此生成 -->
+            </div>
+        </div>
+    </main>
+
+    <script src="../assets/js/creat2-chat.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // 載入導覽列
+            fetch('nav.html')
+                .then(res => res.text())
+                .then(data => {
+                    document.getElementById('nav-placeholder').innerHTML = data;
+                    document.querySelectorAll('.toggle-btn').forEach(btn => {
+                        btn.addEventListener('click', function() {
+                            const sidebar = document.querySelector('.sidebar');
+                            const mainContent = document.querySelector('.main-content');
+                            if(sidebar) sidebar.classList.toggle('collapsed');
+                            if(mainContent) mainContent.classList.toggle('collapsed');
+                        });
+                    });
+                    
+                    // 初始化登入狀態顯示
+                    initAuth();
+                })
+                .catch(console.error);
+
+            // 產生寫死的合約列表
+            setTimeout(() => {
+                renderRecords();
+            }, 300);
+        });
+
+        // 初始化認證UI
+        function initAuth() {
+            const sidebarAuth = document.getElementById("sidebarAuth");
+            if (!sidebarAuth) return;
+
+            function renderAuthContent(user) {
+                if (user) {
+                    let userName = "使用者";
+                    try {
+                        const userData = JSON.parse(user);
+                        userName = userData.name || "使用者";
+                    } catch (e) {
+                        userName = user;
+                    }
+                    return `
+                        <div class="user-info">
+                            <i class="fas fa-user-circle"></i>
+                            <div class="sidebar-footer-name">${userName}</div>
+                            <button id="logoutBtn" class="btn-logout">登出</button>
+                        </div>
+                    `;
+                }
+                return `
+                    <div class="auth-links">
+                        <button class="auth-toggle">
+                            <i class="fas fa-user"></i>
+                            <span>登入/註冊</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <div class="auth-dropdown" id="authDropdown">
+                            <a href="../pages/login.html" class="auth-option">登入</a>
+                            <a href="../pages/register.html" class="auth-option">註冊</a>
+                        </div>
+                    </div>
+                `;
+            }
+
+            function setupAuthDropdown() {
+                const authToggle = sidebarAuth.querySelector('.auth-toggle');
+                const authDropdown = document.getElementById('authDropdown');
+                
+                if (authToggle && authDropdown) {
+                    const newAuthToggle = authToggle.cloneNode(true);
+                    authToggle.parentNode.replaceChild(newAuthToggle, authToggle);
+                    
+                    newAuthToggle.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        authDropdown.classList.toggle('show');
+                    });
+                }
+            }
+
+            function updateAuthUI() {
+                const user = localStorage.getItem("loggedInUser");
+                sidebarAuth.innerHTML = renderAuthContent(user);
+
+                if (user) {
+                    const logoutBtn = document.getElementById("logoutBtn");
+                    if (logoutBtn) {
+                        logoutBtn.addEventListener("click", async () => {
+                            localStorage.removeItem("loggedInUser");
+                            alert("您已成功登出！");
+                            window.location.href = "../pages/index.html";
+                        });
+                    }
+                } else {
+                    setupAuthDropdown();
+                }
+
+                document.addEventListener('click', () => {
+                    const dropdown = document.getElementById('authDropdown');
+                    if (dropdown) {
+                        dropdown.classList.remove('show');
+                    }
+                });
+            }
+
+            updateAuthUI();
+
+            window.addEventListener('storage', (e) => {
+                if (e.key === 'loggedInUser') {
+                    updateAuthUI();
+                }
+            });
+        }
+
+        // 寫死的合約資料
+        const mockRecords = [
+            {
+                id: 'contract_001',
+                title: '「百川水產養殖有限公司」的採購合約紀錄',
+                date: '2026-01-10 14:30',
+                status: '已完成'
+            },
+            {
+                id: 'contract_002',
+                title: '農業設備租賃協議',
+                date: '2026-01-08 10:15',
+                status: '已完成'
+            },
+            {
+                id: 'contract_003',
+                title: '水產品供應合約',
+                date: '2026-01-05 16:45',
+                status: '已完成'
+            },
+            {
+                id: 'contract_004',
+                title: '合作社入股協議',
+                date: '2025-12-28 09:00',
+                status: '已完成'
+            }
+        ];
+
+        // 產生合約列表
+        function renderRecords() {
+            try {
+                const container = document.getElementById('recordsContainer');
+                container.innerHTML = '';
+
+                mockRecords.forEach(record => {
+                    const item = document.createElement('a');
+                    item.href = 'his2.html?id=' + record.id;
+                    item.className = 'record-item';
+                    item.innerHTML = `
+                        <div class="record-info">
+                            <div class="record-title">
+                                <i class="fas fa-file-contract"></i> ${record.title}
+                            </div>
+                            <div class="record-date">
+                                <i class="fas fa-calendar"></i> ${record.date}
+                            </div>
+                        </div>
+                        <div class="record-status">
+                            <i class="fas fa-check-circle"></i> ${record.status}
+                        </div>
+                    `;
+                    container.appendChild(item);
+                });
+            } catch (error) {
+                console.error('錯誤:', error);
+                document.getElementById('recordsContainer').innerHTML = '<p style="color: #e74c3c;">載入失敗</p>';
+            }
+        }
+    </script>
+
+</body>
+</html>

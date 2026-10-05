@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>會員資料</title>
+    <link rel="stylesheet" href="../assets/css/member.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+
+    <div id="nav-placeholder"></div>
+    <link rel="stylesheet" href="../assets/css/nav.css">
+    <script src="../assets/js/nav.js"></script>
+
+    <main class="main-content">
+        <h1 class="page-title">
+            <i class="fas fa-user-circle"></i> 會員資料
+        </h1>
+
+        <div class="container">
+            <!-- 會員資料卡 -->
+            <div class="member-card">
+                <div class="member-header">
+                    <div class="member-avatar">
+                        <i class="fas fa-user-circle"></i>
+                    </div>
+                    <div class="member-info">
+                        <h2 id="memberName">載入中...</h2>
+                        <p id="memberEmail" class="member-email">載入中...</p>
+                        <p id="memberRole" class="member-role">會員身份</p>
+                    </div>
+                    <div class="member-actions">
+                        <button class="action-btn edit-member-btn" id="editMemberBtn" title="編輯個人資料">
+                            <i class="fas fa-edit"></i>
+                            <span>編輯</span>
+                        </button>
+                        <button class="action-btn logout-btn" id="logoutBtn" title="登出">
+                            <i class="fas fa-sign-out-alt"></i>
+                            <span>登出</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 企業知識庫模組 -->
+            <div class="knowledge-base-section">
+                <div class="section-header">
+                    <h3><i class="fas fa-database"></i> 企業內部知識庫</h3>
+                    <p class="section-desc">管理公司基本資料和過去合約案例</p>
+                </div>
+                <div class="kb-grid">
+                    <div class="kb-card">
+                        <div class="kb-icon">
+                            <i class="fas fa-building"></i>
+                        </div>
+                        <h4>公司基本資料</h4>
+                        <p>儲存公司營運相關的基本資訊</p>
+                        <button class="kb-btn" data-kb="company">
+                            <i class="fas fa-upload"></i> 上傳/查看
+                        </button>
+                    </div>
+                    <div class="kb-card">
+                        <div class="kb-icon">
+                            <i class="fas fa-history"></i>
+                        </div>
+                        <h4>過去合約案例</h4>
+                        <p>查看和參考過往簽訂的合約</p>
+                        <button class="kb-btn" data-kb="history">
+                            <i class="fas fa-upload"></i> 上傳/查看
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 公司資訊整合模組 -->
+            <div class="counterparty-section">
+                <div class="section-header">
+                    <h3><i class="fas fa-handshake"></i> 公司資訊查詢</h3>
+                    <p class="section-desc">自動帶入基本資訊，智能填入合約欄位</p>
+                </div>
+                <div class="counterparty-search">
+                    <div class="search-form">
+                        <div class="form-group">
+                            <label for="counterpartyId">統一編號</label>
+                            <input 
+                                type="text" 
+                                id="counterpartyId" 
+                                placeholder="請輸入公司統編（例：12345678）"
+                                class="search-input"
+                            >
+                        </div>
+                        <button id="queryBtn" class="query-btn">
+                            <i class="fas fa-search"></i> 查詢
+                        </button>
+                    </div>
+
+                    <!-- 加載動畫 -->
+                    <div id="counterpartyLoading" class="loading-animation" style="display: none;">
+                        <div class="spinner"></div>
+                        <p id="counterpartyLoadingText">正在連線商工登記資料庫...</p>
+                    </div>
+
+                    <!-- 查詢結果 -->
+                    <div id="counterpartyResults" class="counterparty-results" style="display: none;">
+                        <div class="result-header">
+                            <h4><i class="fas fa-check-circle"></i> 查詢結果</h4>
+                            <button class="use-btn" id="useCounterpartyBtn">使用此資訊</button>
+                        </div>
+                        <div class="result-grid" id="counterpartyContent">
+                            <!-- 結果會在此顯示 -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 會員設定 -->
+            <div class="settings-section">
+                <h3><i class="fas fa-cog"></i> 帳號設定</h3>
+                <div class="settings-list">
+                    <div class="setting-item" id="privacySetting">
+                        <div class="setting-info">
+                            <i class="fas fa-lock"></i>
+                            <span>隱私設定</span>
+                        </div>
+                        <i class="fas fa-chevron-right"></i>
+                    </div>
+                    <div class="setting-item" id="notificationSetting">
+                        <div class="setting-info">
+                            <i class="fas fa-bell"></i>
+                            <span>通知設定</span>
+                        </div>
+                        <i class="fas fa-chevron-right"></i>
+                    </div>
+                    <div class="setting-item" id="passwordSetting">
+                        <div class="setting-info">
+                            <i class="fas fa-key"></i>
+                            <span>更改密碼</span>
+                        </div>
+                        <i class="fas fa-chevron-right"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- 模態視窗 -->
+    <div id="kbModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">企業知識庫</h2>
+                <button class="close-btn" onclick="closeModal('kbModal')">×</button>
+            </div>
+            <div class="modal-body">
+                <p id="modalDesc">這是知識庫管理功能</p>
+                <input type="file" id="kbFile" placeholder="選擇文件上傳...">
+            </div>
+            <div class="modal-footer">
+                <button class="modal-btn modal-btn-secondary" onclick="closeModal('kbModal')">取消</button>
+                <button class="modal-btn modal-btn-primary" onclick="uploadKB()">上傳</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>編輯個人資料</h2>
+                <button class="close-btn" onclick="closeModal('editModal')">×</button>
+            </div>
+            <div class="modal-body">
+                <input type="text" id="editName" placeholder="輸入新的名字">
+                <input type="email" id="editEmail" placeholder="電子郵件">
+                <textarea id="editBio" placeholder="個人簡介" rows="4"></textarea>
+            </div>
+            <div class="modal-footer">
+                <button class="modal-btn modal-btn-secondary" onclick="closeModal('editModal')">取消</button>
+                <button class="modal-btn modal-btn-primary" onclick="saveProfile()">保存</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="settingModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="settingTitle">設定</h2>
+                <button class="close-btn" onclick="closeModal('settingModal')">×</button>
+            </div>
+            <div class="modal-body" id="settingContent">
+                <!-- 內容會動態填充 -->
+            </div>
+            <div class="modal-footer">
+                <button class="modal-btn modal-btn-secondary" onclick="closeModal('settingModal')">關閉</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="../assets/js/member.js"></script>
+</body>
+</html>

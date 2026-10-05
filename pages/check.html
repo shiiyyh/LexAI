@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>審閱合約</title>
+    <link rel="stylesheet" href="../assets/css/check.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .risk-analysis-section {
+            background: #2c3e50;
+            border: 1px solid #34495e;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+        .risk-item {
+            background: #1a252f;
+            border-left: 4px solid #3498db;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 5px;
+        }
+        .risk-item.green {
+            border-left-color: #27ae60;
+        }
+        .risk-item.yellow {
+            border-left-color: #f39c12;
+        }
+        .risk-item.red {
+            border-left-color: #e74c3c;
+        }
+        .risk-level {
+            display: inline-block;
+            font-size: 20px;
+            margin-right: 10px;
+        }
+        .risk-title {
+            color: #ecf0f1;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        .risk-detail {
+            color: #bdc3c7;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+        .risk-suggestion {
+            background: #2c3e50;
+            border-left: 2px solid #3498db;
+            padding: 10px;
+            margin-top: 10px;
+            border-radius: 5px;
+            color: #95a5a6;
+            font-size: 13px;
+        }
+        .rag-source {
+            font-size: 12px;
+            color: #7f8c8d;
+            margin-top: 8px;
+        }
+        .pdf-preview {
+            background: #2c3e50;
+            border: 1px solid #34495e;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            overflow: hidden;
+        }
+        .download-section {
+            background: #27ae60;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: center;
+        }
+        .download-btn {
+            background: #fff;
+            color: #27ae60;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s;
+        }
+        .download-btn:hover {
+            background: #ecf0f1;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+        .download-btn i {
+            font-size: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="nav-placeholder"></div>
+    <link rel="stylesheet" href="../assets/css/nav.css">
+    <script src="../assets/js/nav.js"></script>
+
+    <main class="main-content">
+        <h1 class="page-title">
+                <span class="left-title">審閱合約</span>
+                <span class="editable-title" contenteditable="true">合約審閱</span>
+            </h1>
+        <div class="container">
+            
+            <!-- PDF 檔案預覽 -->
+            <div class="pdf-preview" id="pdfPreviewContainer" style="display: none;">
+                <embed id="pdfPreview" src="" type="application/pdf" style="width: 100%; height: 400px;">
+            </div>
+            
+            <div class="chat-section">
+                <div class="chat-message system-message">
+                    您好，請上傳您的合約文件，我將進行智能審閱並提供風險分析。
+                </div>
+            </div>
+
+            <!-- 對方公司資訊查詢區域 -->
+            <div class="counterparty-info-section">
+                <div class="counterparty-header">
+                    <h3><i class="fas fa-building"></i> 對方公司基本資料</h3>
+                    <p class="section-desc">搜尋對方公司並自動帶入基本資訊</p>
+                </div>
+                <div class="counterparty-search">
+                    <div class="search-form">
+                        <div class="form-group">
+                            <label for="counterpartyIdCheck">統一編號</label>
+                            <input 
+                                type="text" 
+                                id="counterpartyIdCheck" 
+                                placeholder="請輸入公司統編（例：12345678）"
+                                class="search-input"
+                            >
+                        </div>
+                        <button id="queryBtnCheck" class="query-btn">
+                            <i class="fas fa-search"></i> 查詢
+                        </button>
+                    </div>
+
+                    <!-- 加載動畫 -->
+                    <div id="counterpartyLoadingCheck" class="loading-animation" style="display: none;">
+                        <div class="spinner"></div>
+                        <p id="counterpartyLoadingTextCheck">正在連線商工登記資料庫...</p>
+                    </div>
+
+                    <!-- 查詢結果 -->
+                    <div id="counterpartyResultsCheck" class="counterparty-results" style="display: none;">
+                        <div class="result-header">
+                            <h4><i class="fas fa-check-circle"></i> 查詢結果</h4>
+                            <button class="use-btn" id="useCounterpartyBtnCheck">使用此資訊</button>
+                        </div>
+                        <div class="result-grid" id="counterpartyContentCheck">
+                            <!-- 結果會在此顯示 -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 輸入框區域 -->
+            <div class="input-section">
+                <div class="input-wrapper">
+                    <input type="file" id="pdfFileInput" accept="application/pdf" style="display: none;">
+                    <!-- 上傳文件按鈕 -->
+                    <button class="upload-btn" onclick="uploadFile()">
+                        <i class="fas fa-plus-circle"></i>
+                    </button>
+
+                    <div id="fileInfoDisplay" class="file-info" style="display: none;">
+                        <span id="fileNameText"></span>
+                        <button class="clear-file-btn" onclick="clearFileSelection()">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+
+                    <input type="text" id="contractDescription" class="text-input" placeholder="輸入文字">
+
+                    <!-- 送出按鈕 -->
+                    <button class="upload-btn" onclick="askAI()">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="../assets/js/counterparty.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script>
+        // ========== 追蹤對話次數 ==========
+        let conversationCount = 0;
+
+        // ========== 雙向 RAG 檢索 - 寫死數據 ==========
+        const ragDatabase = {
+            externalLaws: {
+                "民法第114條": {
+                    content: "法律行為之意思表示，其內容違反強制規定之公序良俗者，無效。",
+                    source: "民法"
+                },
+                "民法第234條": {
+                    content: "債務人因不可歸責於自己的事由，致不能履行債務者，免除給付義務。",
+                    source: "民法"
+                },
+                "勞基法第15條": {
+                    content: "試用期間不得逾三個月。試用期間超過三個月，以本法關於勞動契約之規定處理之。",
+                    source: "勞動基準法"
+                },
+                "勞基法第32條": {
+                    content: "雇主不得使勞工每日工作時間超過八小時，每週工作時數不超過40小時。",
+                    source: "勞動基準法"
+                },
+                "公平交易法第20條": {
+                    content: "事業不得為限制轉售價格之行為。但公開其成本、費用、利潤等者，不在此限。",
+                    source: "公平交易法"
+                }
+            },
+            internalGuidelines: {
+                "SOP-001": {
+                    title: "對方簽署權限確認",
+                    content: "簽署人必須為公司代表人、董事長或經授權之人員，需提供授權狀或營利事業登記證影本。",
+                    source: "內部合規指引"
+                },
+                "SOP-002": {
+                    title: "爭議條款審查",
+                    content: "關於賠償金額、違約責任等條款需由法務部核准後才可簽署。",
+                    source: "內部合規指引"
+                },
+                "SOP-003": {
+                    title: "保密條款規範",
+                    content: "保密期間不得超過五年，應明確定義受保密信息之範圍。",
+                    source: "內部合規指引"
+                },
+                "SOP-004": {
+                    title: "終止條款要求",
+                    content: "合約應包含終止條款，並明確規定提前解約之通知期間不少於30天。",
+                    source: "內部合規指引"
+                }
+            }
+        };
+
+        // ========== 寫死的風險分析結果 ==========
+        const riskAnalysisData = [
+            {
+                id: 1,
+                level: "red",
+                emoji: "🔴",
+                title: "第5條 違約責任條款不明確",
+                detail: "條款中規定的違約金比例（20%）可能被法院認定為過度，與民法第251條關於損害賠償之規定不符。",
+                suggestion: "建議修改為：『乙方如違約，應支付合約金額之10%作為違約金，但甲方得主張實際損害賠償。』",
+                externalRef: "民法第251條 - 違約金條款",
+                internalRef: "SOP-002"
+            },
+            {
+                id: 2,
+                level: "yellow",
+                emoji: "🟡",
+                title: "第8條 保密期限需調整",
+                detail: "保密期限設定為「永久」，依內部指引應不超過五年。且未明確定義保密信息之範圍。",
+                suggestion: "建議修改為：『保密期間自合約簽署之日起五年，雙方對技術、商業機密承擔保密責任。』",
+                externalRef: "公平交易法相關規定",
+                internalRef: "SOP-003"
+            },
+            {
+                id: 3,
+                level: "yellow",
+                emoji: "🟡",
+                title: "第3條 簽署人身份未確認",
+                detail: "合約未明確要求對方提供簽署人授權證明或營利事業登記證影本，存在簽署權限風險。",
+                suggestion: "建議附件中應包含：(1) 營利事業登記證影本 (2) 法人代表授權書或董事會決議錄",
+                externalRef: "民法第114條 - 法律行為效力",
+                internalRef: "SOP-001"
+            },
+            {
+                id: 4,
+                level: "green",
+                emoji: "🟢",
+                title: "第1條 合約當事人明確",
+                detail: "雙方身份資訊清晰完整，符合合約成立要件。",
+                suggestion: "無需修改，此條款符合法律要求。",
+                externalRef: "民法第154條 - 合約成立",
+                internalRef: "SOP-001"
+            },
+            {
+                id: 5,
+                level: "yellow",
+                emoji: "🟡",
+                title: "第12條 終止條款缺少通知期間",
+                detail: "合約终止條款未規定提前解約之通知期間，可能導致爭議。",
+                suggestion: "建議修改為：『任何一方欲終止本合約，應提前30日以書面通知另一方，逾期視為放棄終止權。』",
+                externalRef: "勞基法第15條 - 契約終止",
+                internalRef: "SOP-004"
+            },
+            {
+                id: 6,
+                level: "green",
+                emoji: "🟢",
+                title: "第9條 付款條件清晰",
+                detail: "付款方式、期限及利息計算均有明確規定，符合民法債權規定。",
+                suggestion: "無需修改，此條款符合法律要求。",
+                externalRef: "民法第282條 - 給付時期",
+                internalRef: "SOP-002"
+            }
+        ];
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // 初始化對方公司查詢功能
+            setupCounterpartyListeners('Check');
+            
+            // 載入導覽列
+            fetch('nav.html')
+                .then(res => res.text())
+                .then(data => {
+                    document.getElementById('nav-placeholder').innerHTML = data;
+                    document.querySelectorAll('.toggle-btn').forEach(btn => {
+                        btn.addEventListener('click', function() {
+                            const sidebar = document.querySelector('.sidebar');
+                            const mainContent = document.querySelector('.main-content');
+                            if(sidebar) sidebar.classList.toggle('collapsed');
+                            if(mainContent) mainContent.classList.toggle('collapsed');
+                        });
+                    });
+                    
+                    // 初始化登入狀態顯示
+                    initAuth();
+                })
+                .catch(console.error);
+        });
+
+        // 初始化認證UI
+        function initAuth() {
+            const sidebarAuth = document.getElementById("sidebarAuth");
+            if (!sidebarAuth) return;
+
+            function renderAuthContent(user) {
+                if (user) {
+                    let userName = "使用者";
+                    try {
+                        const userData = JSON.parse(user);
+                        userName = userData.name || "使用者";
+                    } catch (e) {
+                        userName = user;
+                    }
+                    return `
+                        <div class="user-info">
+                            <i class="fas fa-user-circle"></i>
+                            <div class="sidebar-footer-name">${userName}</div>
+                            <button id="logoutBtn" class="btn-logout">登出</button>
+                        </div>
+                    `;
+                }
+                return `
+                    <div class="auth-links">
+                        <button class="auth-toggle">
+                            <i class="fas fa-user"></i>
+                            <span>登入/註冊</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <div class="auth-dropdown" id="authDropdown">
+                            <a href="../pages/login.html" class="auth-option">登入</a>
+                            <a href="../pages/register.html" class="auth-option">註冊</a>
+                        </div>
+                    </div>
+                `;
+            }
+
+            function setupAuthDropdown() {
+                const authToggle = sidebarAuth.querySelector('.auth-toggle');
+                const authDropdown = document.getElementById('authDropdown');
+                
+                if (authToggle && authDropdown) {
+                    const newAuthToggle = authToggle.cloneNode(true);
+                    authToggle.parentNode.replaceChild(newAuthToggle, authToggle);
+                    
+                    newAuthToggle.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        authDropdown.classList.toggle('show');
+                    });
+                }
+            }
+
+            function updateAuthUI() {
+                const user = localStorage.getItem("loggedInUser");
+                sidebarAuth.innerHTML = renderAuthContent(user);
+
+                if (user) {
+                    const logoutBtn = document.getElementById("logoutBtn");
+                    if (logoutBtn) {
+                        logoutBtn.addEventListener("click", async () => {
+                            localStorage.removeItem("loggedInUser");
+                            alert("您已成功登出！");
+                            window.location.href = "../pages/index.html";
+                        });
+                    }
+                } else {
+                    setupAuthDropdown();
+                }
+
+                document.addEventListener('click', () => {
+                    const dropdown = document.getElementById('authDropdown');
+                    if (dropdown) {
+                        dropdown.classList.remove('show');
+                    }
+                });
+            }
+
+            updateAuthUI();
+
+            window.addEventListener('storage', (e) => {
+                if (e.key === 'loggedInUser') {
+                    updateAuthUI();
+                }
+            });
+        }
+
+        document.getElementById("contractDescription").addEventListener("keydown", function(e){
+            if (e.key === "Enter") {
+                e.preventDefault();
+                askAI();
+            }
+        });
+
+        // 上傳檔案
+        function uploadFile() {
+            const fileInput = document.getElementById("pdfFileInput");
+            fileInput.click();
+
+            fileInput.onchange = async () => {
+                const file = fileInput.files[0];
+                if (!file) return;
+
+                const chat = document.querySelector(".chat-section");
+                chat.innerHTML += `
+                    <div class="chat-message user-message">
+                        <p>📤 上傳檔案：${file.name}</p>
+                    </div>`;
+
+                // 如果是PDF，在預覽區域顯示
+                if (file.type === 'application/pdf') {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        document.getElementById('pdfPreview').src = e.target.result;
+                        document.getElementById('pdfPreviewContainer').style.display = 'block';
+                    };
+                    reader.readAsDataURL(file);
+                }
+
+                // 顯示檔案資訊
+                const fileNameText = document.getElementById('fileNameText');
+                const fileDisplay = document.getElementById('fileInfoDisplay');
+                if (fileNameText) {
+                    fileNameText.textContent = file.name;
+                    fileDisplay.style.display = 'flex';
+                }
+
+                fileInput.value = "";
+            };
+        }
+
+        function clearFileSelection() {
+            const fileInput = document.getElementById('pdfFileInput');
+            const fileDisplay = document.getElementById('fileInfoDisplay');
+            fileInput.value = '';
+            fileDisplay.style.display = 'none';
+        }
+
+        // 清除檔案選取狀態並隱藏顯示區
+        function clearFileSelection() {
+            const fileInput = document.getElementById('pdfFileInput');
+            const fileDisplay = document.getElementById('fileInfoDisplay');
+            const pdfPreviewContainer = document.getElementById('pdfPreviewContainer');
+
+            fileInput.value = ''; 
+            fileDisplay.style.display = 'none';
+            pdfPreviewContainer.style.display = 'none';
+            document.getElementById('pdfPreview').src = '';
+
+            console.log("檔案已清除。");
+        }
+
+        // ========== 下載檔案函數 ==========
+        function downloadRevisedContract() {
+            const link = document.createElement('a');
+            link.href = './養殖生產設備買賣合約（第二修改版）.pdf';
+            link.download = '養殖生產設備買賣合約（第二修改版）.pdf';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        // AI 查詢/提交功能
+        async function askAI() {
+            const userId = localStorage.getItem("user_id");
+
+            if (!userId) {
+                alert("錯誤：無法獲取用戶身份資訊。請重新登入！");
+                window.location.href = "login.html"; 
+                return;
+            }
+
+            const textInput = document.getElementById("contractDescription");
+            const chat = document.querySelector(".chat-section");
+            const description = textInput.value.trim();
+
+            if (!description) {
+                alert("請輸入合約描述或問題！");
+                return;
+            }
+
+            // 顯示使用者訊息
+            chat.innerHTML += `
+                <div class="chat-message user-message">
+                    <p>${description}</p>
+                </div>`;
+
+            textInput.value = "";
+
+            // ========== 第二次對話：提供修改版合約下載 ==========
+            if (conversationCount >= 1) {
+                chat.innerHTML += `
+                    <div class="chat-message system-message">
+                        <p>✅ 已根據風險分析為您生成修改版合約！</p>
+                        <div class="download-section">
+                            <h3 style="color: #fff; margin-bottom: 15px;">📄 修改版合約檔案</h3>
+                            <p style="color: #ecf0f1; margin-bottom: 20px;">已針對所有風險項目進行調整與優化</p>
+                            <button class="download-btn" onclick="downloadRevisedContract()">
+                                <i class="fas fa-download"></i>
+                                下載修改版合約
+                            </button>
+                        </div>
+                    </div>`;
+                chat.scrollTop = chat.scrollHeight;
+                return;
+            }
+
+            // ========== 第一次對話：顯示風險分析 ==========
+            // Loading message
+            chat.innerHTML += `
+                <div class="chat-message system-message" id="loadingMessage">
+                    <p>⌛ 進行雙向RAG檢索與風險分析中...</p>
+                </div>`;
+            chat.scrollTop = chat.scrollHeight;
+
+            // 模擬延遲後顯示寫死的風險分析
+            setTimeout(() => {
+                const loadingMsg = document.getElementById("loadingMessage");
+                
+                let html = `<div style="margin: 15px 0;">
+                    <h3 style="color: #ecf0f1; margin-bottom: 15px;">✅ 合約智能審閱完成</h3>
+                    <div class="risk-analysis-section">`;
+
+                // 顯示所有風險項目
+                riskAnalysisData.forEach(risk => {
+                    html += `
+                        <div class="risk-item ${risk.level}">
+                            <div class="risk-title">
+                                <span class="risk-level">${risk.emoji}</span>
+                                ${risk.title}
+                            </div>
+                            <div class="risk-detail">${risk.detail}</div>
+                            <div class="risk-suggestion">
+                                <b>💡 建議修改版本：</b><br>${risk.suggestion}
+                            </div>
+                            <div class="rag-source">
+                                <b>🔍 外部法規查詢：</b> ${risk.externalRef}<br>
+                                <b>📋 內部合規查詢：</b> ${risk.internalRef}
+                            </div>
+                        </div>`;
+                });
+
+                html += `</div>
+                    <p style="color: #95a5a6; margin-top: 20px; font-size: 14px;">
+                        💬 若需要修改版合約檔案，請繼續提問或輸入任何訊息。
+                    </p>
+                </div>`;
+
+                loadingMsg.innerHTML = html;
+                loadingMsg.removeAttribute('id');
+                chat.scrollTop = chat.scrollHeight;
+
+                // 增加對話計數
+                conversationCount++;
+            }, 1500);
+        }
+    </script>
+</body>
+</html>
